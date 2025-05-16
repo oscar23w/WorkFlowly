@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorAccent">#FFFFFFFF</color>
     <color name="circle_background">#FFFFFFFF</color>
+
+    <color name="color_principal">#29b554</color>
+    <color name="color_titulo">#18375d</color>
 </resources>
