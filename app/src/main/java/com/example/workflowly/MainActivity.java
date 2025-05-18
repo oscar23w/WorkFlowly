@@ -1,5 +1,6 @@
 package com.example.workflowly;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
@@ -31,11 +32,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            /*public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null)
                         .setAnchorView(R.id.fab).show();
+            }*/
+
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, Nuevo_Proyecto.class);
+                startActivity(intent);
             }
+
         });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
