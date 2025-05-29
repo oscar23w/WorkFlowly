@@ -27,9 +27,10 @@
         android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    <TextView
-        android:id="@+id/textView"
+    <Button
+        android:id="@+id/button_cerrar_sesion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/nav_header_subtitle" />
+        android:backgroundTint="@color/color_titulo"
+        android:text="Cerrar Sesión" />
 </LinearLayout>

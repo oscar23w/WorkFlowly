@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Button;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -29,6 +30,26 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        NavigationView navigationView = binding.navView;
+        View headerView = navigationView.getHeaderView(0);
+        Button btnCerrarSesion = headerView.findViewById(R.id.button_cerrar_sesion);
+
+        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSharedPreferences("usuario_sesion", MODE_PRIVATE)
+                        .edit()
+                        .clear()
+                        .apply();
+
+                // Redirigir a pantalla de registro
+                Intent intent = new Intent(MainActivity.this, registro.class);
+                startActivity(intent);
+                finish(); // Para que no puedan volver atrás
+            }
+        });
+
+
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
         DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
+        //NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
