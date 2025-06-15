@@ -11,17 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class adapter_miembro_crear_proyecto extends RecyclerView.Adapter<adapter_miembro_crear_proyecto.ViewHolder> {
+public class adapter_miembro_crear_tarea extends RecyclerView.Adapter<adapter_miembro_crear_tarea.ViewHolder> {
 
-    private List<miembro_crear_proyecto> listaMiembros;
+    private List<miembro_crear_tarea> listaMiembrosAgregados;
     private OnRemoveClickListener removeClickListener;
 
     public interface OnRemoveClickListener {
         void onRemoveClick(int position);
     }
 
-    public adapter_miembro_crear_proyecto(List<miembro_crear_proyecto> listaMiembros, OnRemoveClickListener listener) {
-        this.listaMiembros = listaMiembros;
+    public adapter_miembro_crear_tarea(List<miembro_crear_tarea> listaMiembrosAgregados, OnRemoveClickListener listener) {
+        this.listaMiembrosAgregados = listaMiembrosAgregados;
         this.removeClickListener = listener;
     }
 
@@ -29,14 +29,14 @@ public class adapter_miembro_crear_proyecto extends RecyclerView.Adapter<adapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View vista = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_miembro_registro_proyecto, parent, false);
+                .inflate(R.layout.item_miembro_registro_tarea, parent, false);
         return new ViewHolder(vista);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        miembro_crear_proyecto miembro = listaMiembros.get(position);
-        holder.emailTextView.setText(miembro.getEmail());
+        miembro_crear_tarea miembro = listaMiembrosAgregados.get(position);
+        holder.usernameTextView.setText(miembro.getUsername());
 
         holder.removeButton.setOnClickListener(v -> {
             if (removeClickListener != null) {
@@ -47,21 +47,21 @@ public class adapter_miembro_crear_proyecto extends RecyclerView.Adapter<adapter
 
     @Override
     public int getItemCount() {
-        return listaMiembros.size();
+        return listaMiembrosAgregados.size();
     }
 
-    public List<miembro_crear_proyecto> getMiembros() {
-        return this.listaMiembros;
+    public List<miembro_crear_tarea> getMiembros() {
+        return this.listaMiembrosAgregados;
     }
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView emailTextView;
+        TextView usernameTextView;
         ImageButton removeButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            emailTextView = itemView.findViewById(R.id.textViewEmail);
+            usernameTextView = itemView.findViewById(R.id.textViewUsername);
             removeButton = itemView.findViewById(R.id.buttonRemove);
         }
     }

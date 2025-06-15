@@ -55,12 +55,16 @@ public class registro extends AppCompatActivity {
                                 JSONObject jsonResponse = new JSONObject(response);
                                 String estado = jsonResponse.getString("estado");
                                 String mensaje = jsonResponse.getString("mensaje");
+                                String idUser = jsonResponse.getString("id");
 
                                 if (estado.equals("ok")) {
-                                    SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
+                                                                        SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
                                     SharedPreferences.Editor editor = preferences.edit();
                                     editor.putBoolean("sesion_iniciada", true);
+                                    editor.putString("email", email);
+                                    editor.putString("idUser", idUser); 
                                     editor.apply();
+
                                     Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(registro.this, MainActivity.class);
                                     startActivity(intent);

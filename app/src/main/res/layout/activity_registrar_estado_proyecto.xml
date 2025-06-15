@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Nuevo_Proyecto">
+    tools:context=".registrar_estado_proyecto">
 
     <!-- 🔝 Barra superior personalizada -->
     <LinearLayout
@@ -21,11 +21,11 @@
 
         <!-- Título centrado (expandido) -->
         <TextView
-            android:id="@+id/titleNuevoProyecto"
+            android:id="@+id/tituleNuevoEstado"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Nuevo Proyecto"
+            android:text="Nuevo estado"
             android:textColor="@color/color_titulo"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -56,12 +56,12 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:text="Nombre del proyecto"
+                android:text="Nombre del estado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <EditText
-                android:id="@+id/editTextProjectName"
+                android:id="@+id/editTextNombreEstado"
                 android:hint="Ingrese nombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -83,7 +83,7 @@
 
             <!-- Buscar y añadir miembro -->
             <TextView
-                android:text="Añadir miembro"
+                android:text="Selecciona la posición"
                 android:layout_marginTop="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -93,42 +93,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <AutoCompleteTextView
-                    android:id="@+id/autoCompleteUserSearch"
+                <EditText
+                    android:id="@+id/posicion"
                     android:layout_weight="1"
                     android:layout_width="0dp"
+                    android:inputType="number"
                     android:layout_height="wrap_content"
-                    android:hint="Buscar usuario" />
-
-                <Button
-                    android:id="@+id/buttonAddMember"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/color_principal"
-                    android:text="Añadir"
-                    android:textColor="@color/color_titulo" />
+                    android:hint="Posición" />
             </LinearLayout>
 
-            <!-- Lista de miembros -->
-            <TextView
-                android:text="Miembros"
-                android:layout_marginTop="24dp"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewMembers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
 
             <Button
-                android:id="@+id/Crearproyecto"
+                android:id="@+id/Crearestado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Crear Proyecto"
+                android:text="Crear Estado"
                 android:layout_marginTop="24dp"
                 android:backgroundTint="@color/color_principal"
                 android:textColor="@color/color_titulo" />
