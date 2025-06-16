@@ -55,7 +55,7 @@ public class nueva_tarea extends AppCompatActivity {
 
         //obtener id del proyecto
         String idProyecto = getIntent().getStringExtra("idProyecto");
-        String idEstado = getIntent().getStringExtra("id_estado");
+        String idEstado = getIntent().getStringExtra("idEstado");
 
         consultar_miembros_proyectos_a_bd(idProyecto);
 
@@ -157,7 +157,7 @@ public class nueva_tarea extends AppCompatActivity {
             if (!yaExiste) {
                 listaMiembrosAgregados.add(nuevo);
                 miembroAdapter.notifyItemInserted(listaMiembrosAgregados.size() - 1);
-                Toast.makeText(getApplicationContext(), "Usuario" + user + "añadido a la tarea", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Usuario " + user + " añadido a la tarea", Toast.LENGTH_SHORT).show();
                 username.setText("");
             } else {
                 Toast.makeText(getApplicationContext(), "Ya está en la lista", Toast.LENGTH_SHORT).show();
@@ -250,9 +250,7 @@ public class nueva_tarea extends AppCompatActivity {
                 return params;
             }
         };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(nueva_tarea.this);
-        requestQueue.add(stringRequest);
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
 }
