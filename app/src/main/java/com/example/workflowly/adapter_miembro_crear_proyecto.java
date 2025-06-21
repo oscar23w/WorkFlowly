@@ -38,12 +38,19 @@ public class adapter_miembro_crear_proyecto extends RecyclerView.Adapter<adapter
         miembro_crear_proyecto miembro = listaMiembros.get(position);
         holder.emailTextView.setText(miembro.getEmail());
 
-        holder.removeButton.setOnClickListener(v -> {
-            if (removeClickListener != null) {
-                removeClickListener.onRemoveClick(holder.getAdapterPosition());
-            }
-        });
+        if (miembro.isMostrarEliminar()) {
+            holder.removeButton.setVisibility(View.VISIBLE);
+            holder.removeButton.setOnClickListener(v -> {
+                if (removeClickListener != null) {
+                    removeClickListener.onRemoveClick(holder.getAdapterPosition());
+                }
+            });
+        } else {
+            holder.removeButton.setVisibility(View.GONE); // Oculta el botón completamente
+            holder.removeButton.setOnClickListener(null); // Evita referencias innecesarias
+        }
     }
+
 
     @Override
     public int getItemCount() {

@@ -54,83 +54,19 @@ public class Nuevo_Proyecto extends AppCompatActivity {
             return insets;
         });
 
-        Button buttonCrearProyecto = findViewById(R.id.Crearproyecto);
+        usuarios_proyecto_function();
+        cerrar_pantalla_function();
 
+        Button buttonCrearProyecto = findViewById(R.id.Crearproyecto);
         buttonCrearProyecto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                List<miembro_crear_proyecto> miembros = miembroAdapter.getMiembros();
-                List<String> correos = new ArrayList<>();
-                for (miembro_crear_proyecto m : miembros) {
-                    correos.add(m.getEmail());
-                }
-
-                EditText editTextNombreProyecto = findViewById(R.id.editTextProjectName);
-                EditText editTextDescripcionProyecto = findViewById(R.id.editTextDescription);
-
-                String NombreProyecto = editTextNombreProyecto.getText().toString().trim();
-                String DescripcionProyecto = editTextDescripcionProyecto.getText().toString().trim();
-
-                SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
-                String idCreador = preferences.getString("idUser", null);
-
-                JSONArray jsonArrayMiembros = new JSONArray();
-                for (miembro_crear_proyecto m : miembros) {
-                    jsonArrayMiembros.put(m.getEmail());
-                }
-                // Luego conviértelo a string para mandarlo
-                String correosJson = jsonArrayMiembros.toString();
-
-                //String mensaje = TextUtils.join(", ", correos);
-                //Toast.makeText(Nuevo_Proyecto.this, "Correos: " + mensaje, Toast.LENGTH_LONG).show();
-
-                String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_proyecto.php";
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        response -> {
-                            try {
-                                JSONObject jsonResponse = new JSONObject(response);
-                                String estado = jsonResponse.getString("estado");
-                                String mensaje = jsonResponse.getString("mensaje");
-
-                                if (estado.equals("ok")) {
-                                    Toast.makeText(getApplicationContext(), "Registro de proyecto exitoso", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(Nuevo_Proyecto.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-
-                                } else {
-                                    Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
-                ) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("id_creador", idCreador);
-                        params.put("nombre", NombreProyecto);
-                        params.put("descripcion", DescripcionProyecto);
-                        params.put("listaUsuariosAgregados", correosJson);
-                        return params;
-                    }
-                };
-
-                RequestQueue requestQueue = Volley.newRequestQueue(Nuevo_Proyecto.this);
-                requestQueue.add(stringRequest);
-
+                guardar_proyecto_function();
             }
         });
+    }
 
-
-
-
-
+    private void usuarios_proyecto_function(){
         // Inicializar RecyclerView y lista
         recyclerViewMembers = findViewById(R.id.recyclerViewMembers);
         recyclerViewMembers.setLayoutManager(new LinearLayoutManager(this));
@@ -145,10 +81,10 @@ public class Nuevo_Proyecto extends AppCompatActivity {
         recyclerViewMembers.setAdapter(miembroAdapter);
 
         Button BotonAgregarUsuario = findViewById(R.id.buttonAddMember);
-        AutoCompleteTextView UserMail = findViewById(R.id.autoCompleteUserSearch);
+        AutoCompleteTextView UserUsername = findViewById(R.id.autoCompleteUserSearch);
 
         BotonAgregarUsuario.setOnClickListener(v -> {
-            String email = UserMail.getText().toString().trim();
+            String username = UserUsername.getText().toString().trim();
             String url = "http://workflowly.atwebpages.com/app_db_conexion/consultar_usuario_agregar_proyecto.php";
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -160,7 +96,8 @@ public class Nuevo_Proyecto extends AppCompatActivity {
                             String id = jsonResponse.getString("id");
 
                             if (estado.equals("ok")) {
-                                miembro_crear_proyecto nuevo = new miembro_crear_proyecto(id, email);
+                                boolean mostrarBoton = true;
+                                miembro_crear_proyecto nuevo = new miembro_crear_proyecto(id, username, mostrarBoton);
 
                                 boolean yaExiste = false;
                                 for (miembro_crear_proyecto m : listaMiembros) {
@@ -174,7 +111,7 @@ public class Nuevo_Proyecto extends AppCompatActivity {
                                     listaMiembros.add(nuevo);
                                     miembroAdapter.notifyItemInserted(listaMiembros.size() - 1);
                                     Toast.makeText(getApplicationContext(), "Usuario añadido", Toast.LENGTH_SHORT).show();
-                                    UserMail.setText("");
+                                    UserUsername.setText("");
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Ya está en la lista", Toast.LENGTH_SHORT).show();
                                 }
@@ -191,14 +128,79 @@ public class Nuevo_Proyecto extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
-                    params.put("email", email);
+                    params.put("username", username);
                     return params;
                 }
             };
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
         });
+    }
 
+    private void guardar_proyecto_function(){
+        List<miembro_crear_proyecto> miembros = miembroAdapter.getMiembros();
+        List<String> correos = new ArrayList<>();
+        for (miembro_crear_proyecto m : miembros) {
+            correos.add(m.getEmail());
+        }
+
+        EditText editTextNombreProyecto = findViewById(R.id.editTextProjectName);
+        EditText editTextDescripcionProyecto = findViewById(R.id.editTextDescription);
+
+        String NombreProyecto = editTextNombreProyecto.getText().toString().trim();
+        String DescripcionProyecto = editTextDescripcionProyecto.getText().toString().trim();
+
+        SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
+        String idCreador = preferences.getString("idUser", null);
+
+        JSONArray jsonArrayMiembros = new JSONArray();
+        for (miembro_crear_proyecto m : miembros) {
+            jsonArrayMiembros.put(m.getEmail());
+        }
+        // Luego conviértelo a string para mandarlo
+        String correosJson = jsonArrayMiembros.toString();
+
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_proyecto.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if (estado.equals("ok")) {
+                            Toast.makeText(getApplicationContext(), "Registro de proyecto exitoso", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(Nuevo_Proyecto.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_creador", idCreador);
+                params.put("nombre", NombreProyecto);
+                params.put("descripcion", DescripcionProyecto);
+                params.put("listaUsuariosAgregados", correosJson);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(Nuevo_Proyecto.this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void cerrar_pantalla_function(){
         // Botón cerrar
         ImageButton botonCerrar = findViewById(R.id.buttonClose);
         botonCerrar.setOnClickListener(view -> {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.workflowly.MainActivity;
+import com.example.workflowly.editar_proyecto;
 import com.example.workflowly.proyecto;
 import com.example.workflowly.R;
 import com.example.workflowly.databinding.FragmentHomeBinding;
@@ -47,11 +49,21 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        LinearLayout linearLayout = binding.linearLayoutContenedor;
-
         SharedPreferences preferences = requireActivity().getSharedPreferences("usuario_sesion", getContext().MODE_PRIVATE);
         String id_user = preferences.getString("idUser", null);
 
+        mostrar_proyectos(id_user);
+
+        return root;
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+
+    private void mostrar_proyectos(String id_user){
+        LinearLayout linearLayout = binding.linearLayoutContenedor;
         String url = "http://workflowly.atwebpages.com/app_db_conexion/mostrar_proyectos_usuario.php";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -91,6 +103,7 @@ public class HomeFragment extends Fragment {
                                 TextView descripcion = cardView.findViewById(R.id.descripcionProyecto);
                                 TextView tareasView = cardView.findViewById(R.id.tareasProyecto);
                                 LinearLayout contenedorUsuarios = cardView.findViewById(R.id.contenedorUsuarios);
+                                ImageButton botonEditarProyecto = cardView.findViewById(R.id.buttonEditProject);
 
                                 titulo.setText(nombres.get(i));
                                 descripcion.setText(descripciones.get(i));
@@ -111,8 +124,17 @@ public class HomeFragment extends Fragment {
                                 cardView.setOnClickListener(v -> {
                                     Toast.makeText(requireContext(), "ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
 
-                                    Intent intent = new Intent(requireContext(), proyecto.class); // Usa el nombre correcto de tu actividad
+                                    Intent intent = new Intent(requireContext(), proyecto.class);
                                     intent.putExtra("idProyecto", idProyecto); // Si quieres enviar el ID
+                                    startActivity(intent);
+                                });
+
+                                botonEditarProyecto.setOnClickListener(v -> {
+                                    Toast.makeText(requireContext(), "Editar proyecto => ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
+
+                                    Intent intent = new Intent(requireContext(), editar_proyecto.class);
+                                    intent.putExtra("idProyecto", idProyecto);
+                                    intent.putExtra("idUsuario", id_user);
                                     startActivity(intent);
                                 });
 
@@ -139,13 +161,6 @@ public class HomeFragment extends Fragment {
 
         RequestQueue requestQueue = Volley.newRequestQueue(requireContext());
         requestQueue.add(stringRequest);
-
-        return root;
-    }
-
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
     }
 
     @Override

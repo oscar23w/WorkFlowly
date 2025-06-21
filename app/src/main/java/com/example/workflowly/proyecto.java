@@ -40,9 +40,6 @@ import android.view.DragEvent;
 import android.view.ViewGroup;
 import java.util.function.Consumer;
 
-import android.content.ClipData;
-import android.view.View;
-
 public class proyecto extends AppCompatActivity {
     Handler scrollHandler = new Handler();
     Runnable scrollRunnable = null;
@@ -246,8 +243,23 @@ public class proyecto extends AppCompatActivity {
 
                                 // Modificas los textos
                                 txtTitulo.setText(nombresTareas.get(j));
-                                txtFecha.setText(fechasTareas.get(j));
-                                txtDescripcion.setText(descripcionesTareas.get(j));
+
+                                if (!fechasTareas.get(j).equals("null")){
+                                    txtFecha.setText(fechasTareas.get(j));
+                                } else {
+                                    txtFecha.setVisibility(View.GONE);
+                                }
+
+                                if (!descripcionesTareas.get(j).equals("")) {
+                                    String descripcion = descripcionesTareas.get(j);
+                                    if (descripcion.length() > 255) {
+                                        descripcion = descripcion.substring(0, 255) + "...";
+                                    }
+                                    txtDescripcion.setText(descripcion);
+                                } else {
+                                    txtDescripcion.setVisibility(View.GONE);
+                                }
+
                                 if (estadosTareas.get(j).equals("0")){
                                     txtEstado.setText("Estado: Pendiente");
                                 } else{
@@ -273,6 +285,13 @@ public class proyecto extends AppCompatActivity {
                                     return true;
                                 });
 
+                                //AGREGAR ENLACE PARA EDITAR EN EL TITULO DE LA CARD
+                                txtTitulo.setOnClickListener(v -> {
+                                    Intent intent = new Intent(proyecto.this, editar_tarea.class);
+                                    intent.putExtra("idTarea", idTarea);
+                                    intent.putExtra("idProyecto", idProyecto);
+                                    startActivity(intent);
+                                });
 
                                 // Agregar card a la columna
                                 columna.addView(cardView);

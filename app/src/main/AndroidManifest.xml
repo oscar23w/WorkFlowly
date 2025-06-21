@@ -17,6 +17,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Cuenta"
+            android:exported="false" />
+        <activity
+            android:name=".editar_proyecto"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".editar_tarea"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name=".nueva_tarea"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />

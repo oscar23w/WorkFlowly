@@ -2,16 +2,18 @@ package com.example.workflowly;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -35,37 +36,149 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class nueva_tarea extends AppCompatActivity {
+public class editar_tarea extends AppCompatActivity {
     private adapter_miembro_crear_tarea miembroAdapter;
     private List<miembro_crear_tarea> listaMiembrosAgregados;
     private RecyclerView recyclerViewMembers;
+
+    private List<String> miembrosYaAgregados;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_nueva_tarea);
+        setContentView(R.layout.activity_editar_tarea);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        String idTarea = getIntent().getStringExtra("idTarea");
+        String idProyecto = getIntent().getStringExtra("idProyecto");
+
+        consultar_datos_tarea(idTarea, idProyecto);
         agregar_calendario_input_fecha();
 
-        //obtener id del proyecto
-        String idProyecto = getIntent().getStringExtra("idProyecto");
-        String idEstado = getIntent().getStringExtra("idEstado");
-
-        consultar_miembros_proyectos_a_bd(idProyecto);
-
-        Button buttonCrearTarea = findViewById(R.id.btnGuardarTarea);
-        buttonCrearTarea.setOnClickListener(new View.OnClickListener() {
+        //BOTON EDITAR
+        Button buttonEditarTarea = findViewById(R.id.btnGuardarTarea);
+        buttonEditarTarea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registrar_tarea(idProyecto, idEstado);
+                editar_tarea_seleccionada(idProyecto, idTarea);
             }
         });
+
+        //BOTON ELIMINAR
+        Button botonEliminar = findViewById(R.id.btnEliminarTarea);
+        botonEliminar.setOnClickListener(v -> {
+            new AlertDialog.Builder(editar_tarea.this)
+                    .setTitle("Confirmar eliminación")
+                    .setMessage("¿Estás seguro de que deseas eliminar este elemento?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        eliminar_tarea_seleccionada(idProyecto, idTarea);
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+
+    }
+
+    public void agregar_calendario_input_fecha() {
+        EditText editTextFecha = findViewById(R.id.editTextFechaVencimiento);
+
+        editTextFecha.setOnClickListener(v -> {
+            final Calendar calendario = Calendar.getInstance();
+
+            // Intentamos obtener la fecha del campo si existe
+            String fechaTexto = editTextFecha.getText().toString();
+            if (!fechaTexto.isEmpty()) {
+                try {
+                    // Suponiendo que el formato es dd/MM/yyyy
+                    String[] partes = fechaTexto.split("/");
+                    int dia = Integer.parseInt(partes[0]);
+                    int mes = Integer.parseInt(partes[1]) - 1; // mes empieza en 0
+                    int año = Integer.parseInt(partes[2]);
+
+                    calendario.set(Calendar.DAY_OF_MONTH, dia);
+                    calendario.set(Calendar.MONTH, mes);
+                    calendario.set(Calendar.YEAR, año);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // Si falla el parseo, se usará la fecha actual
+                }
+            }
+
+            int año = calendario.get(Calendar.YEAR);
+            int mes = calendario.get(Calendar.MONTH);
+            int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    editar_tarea.this,
+                    (view, year, monthOfYear, dayOfMonth) -> {
+                        String fechaSeleccionada = String.format("%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year);
+                        editTextFecha.setText(fechaSeleccionada);
+                    },
+                    año, mes, dia
+            );
+            datePickerDialog.show();
+        });
+    }
+
+    private void consultar_datos_tarea(String id_tarea, String id_proyecto){
+        TextView tituloTarea = findViewById(R.id.editTextNombreTarea);
+        TextView fechaTarea = findViewById(R.id.editTextFechaVencimiento);
+        TextView descripcionTarea = findViewById(R.id.editTextDescripcion);
+
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/consultar_datos_tarea.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+                        String titulo_tarea = jsonResponse.getString("titulo_tarea");
+                        String fecha_tarea = jsonResponse.getString("fecha_tarea");
+                        String descripcion_tarea = jsonResponse.getString("descripcion_tarea");
+                        JSONArray listaMiembrosYaAgregados = jsonResponse.getJSONArray("lista_usuarios");
+
+                        miembrosYaAgregados = new ArrayList<>();
+                        for (int j = 0; j < listaMiembrosYaAgregados.length(); j++) {
+                            miembrosYaAgregados.add(listaMiembrosYaAgregados.getString(j));
+                        }
+
+                        if (estado.equals("ok")) {
+                            tituloTarea.setText(titulo_tarea);
+
+                            if(fecha_tarea != "null"){
+                                fechaTarea.setText(fecha_tarea);
+                            }
+
+                            descripcionTarea.setText(descripcion_tarea);
+
+                            consultar_miembros_proyectos_a_bd(id_proyecto);
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_tarea", id_tarea);
+                params.put("id_proyecto", id_proyecto);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(stringRequest);
+
 
     }
 
@@ -128,6 +241,16 @@ public class nueva_tarea extends AppCompatActivity {
                 "Oscar Villarreal", "Luis Pérez", "María López", "Carlos García", "Ana Torres"
         );*/
 
+
+        for (String miembro : miembrosYaAgregados) {
+            miembro_crear_tarea nuevo = new miembro_crear_tarea(miembro);
+            listaMiembrosAgregados.add(nuevo);
+            miembroAdapter.notifyItemInserted(listaMiembrosAgregados.size() - 1);
+        }
+
+
+
+
         AutoCompleteTextView autoCompleteUserSearch = findViewById(R.id.autoCompleteUserSearch);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
@@ -167,48 +290,7 @@ public class nueva_tarea extends AppCompatActivity {
         });
     }
 
-    public void agregar_calendario_input_fecha() {
-        EditText editTextFecha = findViewById(R.id.editTextFechaVencimiento);
-
-        editTextFecha.setOnClickListener(v -> {
-            final Calendar calendario = Calendar.getInstance();
-
-            // Intentamos obtener la fecha del campo si existe
-            String fechaTexto = editTextFecha.getText().toString();
-            if (!fechaTexto.isEmpty()) {
-                try {
-                    // Suponiendo que el formato es dd/MM/yyyy
-                    String[] partes = fechaTexto.split("/");
-                    int dia = Integer.parseInt(partes[0]);
-                    int mes = Integer.parseInt(partes[1]) - 1; // mes empieza en 0
-                    int año = Integer.parseInt(partes[2]);
-
-                    calendario.set(Calendar.DAY_OF_MONTH, dia);
-                    calendario.set(Calendar.MONTH, mes);
-                    calendario.set(Calendar.YEAR, año);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    // Si falla el parseo, se usará la fecha actual
-                }
-            }
-
-            int año = calendario.get(Calendar.YEAR);
-            int mes = calendario.get(Calendar.MONTH);
-            int dia = calendario.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    nueva_tarea.this,
-                    (view, year, monthOfYear, dayOfMonth) -> {
-                        String fechaSeleccionada = String.format("%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year);
-                        editTextFecha.setText(fechaSeleccionada);
-                    },
-                    año, mes, dia
-            );
-            datePickerDialog.show();
-        });
-    }
-
-    public void registrar_tarea(String idProyecto, String idEstado){
+    public void editar_tarea_seleccionada(String idProyecto, String id_tarea){
         List<miembro_crear_tarea> miembros = miembroAdapter.getMiembros();
         List<String> nombres_de_usuario = new ArrayList<>();
         for (miembro_crear_tarea m : miembros) {
@@ -220,10 +302,7 @@ public class nueva_tarea extends AppCompatActivity {
         EditText editTextDescripcionTarea = findViewById(R.id.editTextDescripcion);
 
         String NombreTarea = editTextNombreTarea.getText().toString().trim();
-
-        String FechaTareaTexto = editTextFechaTarea.getText().toString().trim();
-        String FechaTarea = FechaTareaTexto.isEmpty() ? "null" : FechaTareaTexto;
-
+        String FechaTarea = editTextFechaTarea.getText().toString().trim();
         String DescripcionTarea = editTextDescripcionTarea.getText().toString().trim();
 
         JSONArray jsonArrayMiembros = new JSONArray();
@@ -233,7 +312,7 @@ public class nueva_tarea extends AppCompatActivity {
         // Luego conviértelo a string para mandarlo
         String usersJson = jsonArrayMiembros.toString();
 
-        String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_nueva_tarea.php";
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/editar_tarea.php";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
@@ -243,8 +322,8 @@ public class nueva_tarea extends AppCompatActivity {
                         String mensaje = jsonResponse.getString("mensaje");
 
                         if (estado.equals("ok")) {
-                            Toast.makeText(getApplicationContext(), "Registro de tarea exitoso", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(nueva_tarea.this, proyecto.class);
+                            Toast.makeText(getApplicationContext(), "Tarea editada exitosamente", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(editar_tarea.this, proyecto.class);
                             intent.putExtra("idProyecto", idProyecto); // Enviar ID de proyecto a siguiente pantalla
                             startActivity(intent);
                             finish();
@@ -262,12 +341,48 @@ public class nueva_tarea extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("id_proyecto", idProyecto);
-                params.put("id_estado", idEstado);
+                params.put("id_tarea", id_tarea);
                 params.put("nombre", NombreTarea);
                 params.put("descripcion", DescripcionTarea);
                 params.put("fecha", FechaTarea);
                 params.put("listaUsuariosAgregados", usersJson);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    public void eliminar_tarea_seleccionada(String idProyecto, String id_tarea){
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/eliminar_tarea.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        String mensaje = jsonResponse.getString("mensaje");
+
+                        if (estado.equals("ok")) {
+                            Toast.makeText(getApplicationContext(), "Tarea eliminada exitosamente", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(editar_tarea.this, proyecto.class);
+                            intent.putExtra("idProyecto", idProyecto); // Enviar ID de proyecto a siguiente pantalla
+                            startActivity(intent);
+                            finish();
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_tarea", id_tarea);
                 return params;
             }
         };

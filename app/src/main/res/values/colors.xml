@@ -12,4 +12,5 @@
 
     <color name="color_principal">#29b554</color>
     <color name="color_titulo">#18375d</color>
+    <color name="color_rojo">#F44336</color>
 </resources>
