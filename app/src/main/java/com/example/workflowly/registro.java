@@ -40,64 +40,68 @@ public class registro extends AppCompatActivity {
         BotonRegistrar = findViewById(R.id.BotonRegistrar);
 
         BotonRegistrar.setOnClickListener(v -> {
-            String username = Username.getText().toString().trim();
-            String email = Email.getText().toString().trim();
-            String password = Password.getText().toString();
-            String password2 = Password2.getText().toString();
-
-            if (validar_registro(username, email, password, password2)) {
-                //Toast.makeText(this, "Registro válido 🎉", Toast.LENGTH_SHORT).show();
-                String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_usuarios.php";
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        response -> {
-                            try {
-                                JSONObject jsonResponse = new JSONObject(response);
-                                String estado = jsonResponse.getString("estado");
-                                String mensaje = jsonResponse.getString("mensaje");
-                                String idUser = jsonResponse.getString("id");
-
-                                if (estado.equals("ok")) {
-                                                                        SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = preferences.edit();
-                                    editor.putBoolean("sesion_iniciada", true);
-                                    editor.putString("email", email);
-                                    editor.putString("idUser", idUser); 
-                                    editor.apply();
-
-                                    Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(registro.this, MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-
-                                } else {
-                                    Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
-                ) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("username", username);
-                        params.put("email", email);
-                        params.put("password", password);
-                        return params;
-                    }
-                };
-
-                RequestQueue requestQueue = Volley.newRequestQueue(this);
-                requestQueue.add(stringRequest);
-
-
-
-
-            }
+            registrar();
         });
+    }
+
+    private void registrar(){
+        String username = Username.getText().toString().trim();
+        String email = Email.getText().toString().trim();
+        String password = Password.getText().toString();
+        String password2 = Password2.getText().toString();
+
+        if (validar_registro(username, email, password, password2)) {
+            //Toast.makeText(this, "Registro válido 🎉", Toast.LENGTH_SHORT).show();
+            String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_usuarios.php";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    response -> {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            String estado = jsonResponse.getString("estado");
+                            String mensaje = jsonResponse.getString("mensaje");
+                            String idUser = jsonResponse.getString("id");
+
+                            if (estado.equals("ok")) {
+                                SharedPreferences preferences = getSharedPreferences("usuario_sesion", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.putBoolean("sesion_iniciada", true);
+                                editor.putString("email", email);
+                                editor.putString("idUser", idUser);
+                                editor.apply();
+
+                                Toast.makeText(getApplicationContext(), "Registro exitoso", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(registro.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Error de JSON", Toast.LENGTH_SHORT).show();
+                        }
+                    },
+                    error -> Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show()
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", username);
+                    params.put("email", email);
+                    params.put("password", password);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+
+
+
+
+        }
     }
 
     private boolean validar_registro(String username, String email, String password, String password2) {
