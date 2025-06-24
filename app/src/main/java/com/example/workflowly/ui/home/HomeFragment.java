@@ -79,12 +79,14 @@ public class HomeFragment extends Fragment {
                             JSONArray descripcionesArray = jsonResponse.getJSONArray("lista_descripcion_proyectos");
                             JSONArray tareasArray = jsonResponse.getJSONArray("lista_tareas_proyectos");
                             JSONArray usuariosArray = jsonResponse.getJSONArray("lista_usuarios_proyectos");
+                            JSONArray usuariosImgArray = jsonResponse.getJSONArray("lista_img_usuarios_proyectos");
 
                             List<String> idsProyectos = new ArrayList<>();
                             List<String> nombres = new ArrayList<>();
                             List<String> descripciones = new ArrayList<>();
                             List<String> tareas = new ArrayList<>();
                             List<String> usuariosList = new ArrayList<>();
+                            List<String> usuariosListImg = new ArrayList<>();
 
                             for (int i = 0; i < nombresArray.length(); i++) {
                                 idsProyectos.add(idsArray.getString(i));
@@ -92,6 +94,7 @@ public class HomeFragment extends Fragment {
                                 descripciones.add(descripcionesArray.getString(i));
                                 tareas.add(tareasArray.getString(i));
                                 usuariosList.add(usuariosArray.getString(i));  // Asume lista de usuarios como String
+                                usuariosListImg.add(usuariosImgArray.getString(i));
                             }
 
                             LayoutInflater layoutInflater = getLayoutInflater();
