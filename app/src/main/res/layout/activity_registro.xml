@@ -108,6 +108,18 @@ android:background="#FFFFFF">
             android:layout_marginTop="24dp"
             android:backgroundTint="@color/color_principal"
             android:textColor="@color/color_titulo" />
+
+        <TextView
+            android:id="@+id/enlace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:autoLink="web"
+            android:linksClickable="true"
+            android:text="¿Ya tienes cuenta? Ingresa aqui"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>
 

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,13 @@ public class registro extends AppCompatActivity {
         Password = findViewById(R.id.Password);
         Password2 = findViewById(R.id.Password2);
         BotonRegistrar = findViewById(R.id.BotonRegistrar);
+
+        TextView enlace = findViewById(R.id.enlace);
+        enlace.setOnClickListener(v -> {
+            Intent intent = new Intent(registro.this, login.class);
+            startActivity(intent);
+        });
+
 
         BotonRegistrar.setOnClickListener(v -> {
             registrar();
