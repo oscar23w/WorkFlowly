@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
@@ -44,6 +45,7 @@ public class ImagenPerfil extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_imagen_perfil);
 
         imageViewFull = findViewById(R.id.imageViewFull);
@@ -64,6 +66,13 @@ public class ImagenPerfil extends AppCompatActivity {
 
         SharedPreferences preferences = ImagenPerfil.this.getSharedPreferences("usuario_sesion", MODE_PRIVATE);
         id_user = preferences.getString("idUser", null);
+
+        String imagenActual = getIntent().getStringExtra("imagen_actual");
+        Glide.with(this)
+                .load(imagenActual)
+                .error(R.drawable.user)
+                .into(imageViewFull);
+        //Toast.makeText(getApplicationContext(), imagenActual, Toast.LENGTH_SHORT).show();
 
         btnEliminar.setOnClickListener(v -> {
             // Vacío por ahora

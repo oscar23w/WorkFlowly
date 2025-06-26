@@ -20,6 +20,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.workflowly.MainActivity;
 import com.example.workflowly.editar_proyecto;
 import com.example.workflowly.proyecto;
@@ -37,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 import android.widget.Toast;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class HomeFragment extends Fragment {
 
@@ -113,15 +117,41 @@ public class HomeFragment extends Fragment {
                                 tareasView.setText("Tareas: " + tareas.get(i));
 
                                 // Simulamos múltiples usuarios separando por comas (si así vienen)
-                                String[] usuarios = usuariosList.get(i).split(",");
+                                String[] usuarios = usuariosListImg.get(i).split(",");
+
                                 for (String usuario : usuarios) {
+                                    // Limpiar la cadena (eliminar [ ] y backslashes)
+                                    usuario = usuario.replace("[", "")
+                                            .replace("]", "")
+                                            .replace("\\", "") // elimina backslashes
+                                            .replace("\"", "")
+                                            .trim();
+
+
+                                    // Crear un nuevo ImageView para cada usuario
                                     ImageView img = new ImageView(getContext());
-                                    img.setImageResource(R.drawable.user);
+
+                                    // Establecer el tamaño y márgenes
                                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dpToPx(24), dpToPx(24));
                                     params.setMargins(0, 0, dpToPx(8), 0);
                                     img.setLayoutParams(params);
+
+                                    // Convertir el radio de esquinas a píxeles (opcional)
+                                    int radiusDp = 24; // Cambia este valor si quieres esquinas redondeadas
+                                    int radiusPx = dpToPx(radiusDp);
+
+                                    // Cargar la imagen desde la URL (usuario) con Glide
+                                    Glide.with(getContext())
+                                            .load(usuario) // aquí usuario debe contener la URL
+                                            .transform(new CenterCrop(), new RoundedCornersTransformation(radiusPx, 0))
+                                            .placeholder(R.drawable.ic_launcher_foreground)
+                                            .error(R.drawable.user)
+                                            .into(img);
+
+                                    // Agregar la imagen al contenedor
                                     contenedorUsuarios.addView(img);
                                 }
+
 
                                 String idProyecto = idsProyectos.get(i);
                                 cardView.setOnClickListener(v -> {

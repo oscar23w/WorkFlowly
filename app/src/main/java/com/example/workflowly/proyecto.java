@@ -8,8 +8,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,7 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,6 +31,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +46,8 @@ import java.util.Map;
 import android.view.DragEvent;
 import android.view.ViewGroup;
 import java.util.function.Consumer;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class proyecto extends AppCompatActivity {
     Handler scrollHandler = new Handler();
@@ -262,22 +271,40 @@ public class proyecto extends AppCompatActivity {
 
                                 if (estadosTareas.get(j).equals("0")){
                                     txtEstado.setText("Estado: Pendiente");
-                                } else{
+                                    txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_pendiente));
+                                } else {
                                     txtEstado.setText("Estado: Finalizado");
+                                    txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_finalizado));
                                 }
 
                                 // Agregar imagen de miembro (si quieres)
-                                ImageView miembro = new ImageView(this);
-                                miembro.setImageResource(R.drawable.user); // Asegúrate de tener esta imagen
-                                LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(dpToPx(32), dpToPx(32));
-                                imgParams.setMarginEnd(dpToPx(4));
-                                miembro.setLayoutParams(imgParams);
-                                miembro.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                miembro.setBackgroundResource(R.drawable.circle_background);
-                                miembrosLayout.addView(miembro);
+                                String idTarea = idsTareas.get(j);
+                                String finalTitulo = nombresTareas.get(j);
+                                String finalDescripcion = descripcionesTareas.get(j);
+                                String finalFecha = fechasTareas.get(j).equals("null") ? "No definida" : fechasTareas.get(j);
+                                String finalEstado = estadosTareas.get(j).equals("0") ? "Pendiente" : "Finalizado";
+
+                                TextView finalTxtEstadoCard = txtEstado;
+
+                                cardView.setOnTouchListener(new DoubleClickListener(this, new GestureDetector.SimpleOnGestureListener() {
+                                    @Override
+                                    public boolean onDoubleTap(MotionEvent e) {
+                                        // Leer el estado actual del TextView en la card
+                                        String textoEstadoActual = finalTxtEstadoCard.getText().toString(); // Ej: "Estado: Finalizado"
+                                        String estadoExtraido = textoEstadoActual.contains("Finalizado") ? "Finalizado" : "Pendiente";
+
+                                        mostrarInformacionTarea(finalTitulo, finalDescripcion, finalFecha, estadoExtraido, finalTxtEstadoCard);
+                                        return true;
+                                    }
+                                }));
+
+
+
+
+                                consultarImagenesDeUsuarios(idTarea, cardView);
 
                                 //INFO ADICIONAL PARA ARRASTRAR LA CARD
-                                String idTarea = idsTareas.get(j);
+
                                 cardView.setOnLongClickListener(v -> {
                                     ClipData data = ClipData.newPlainText("id_tarea", idTarea);
                                     View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
@@ -502,6 +529,116 @@ public class proyecto extends AppCompatActivity {
 
         Volley.newRequestQueue(this).add(stringRequest);
     }
+
+    private void consultarImagenesDeUsuarios(String idTarea, View cardView){
+        String url_tareas = "http://workflowly.atwebpages.com/app_db_conexion/consultar_usuarios_tarea.php";
+        StringRequest stringRequest_tareas = new StringRequest(Request.Method.POST, url_tareas,
+                response_tareas -> {
+                    try {
+                        JSONObject jsonResponse_tareas = new JSONObject(response_tareas);
+                        String estado_tareas = jsonResponse_tareas.getString("estado");
+                        String mensaje_tareas = jsonResponse_tareas.getString("mensaje");
+
+                        if (estado_tareas.equals("ok")) {
+                            JSONArray lista_ids_tareas = jsonResponse_tareas.getJSONArray("lista_img");
+                            List<String> imagenesTarea = new ArrayList<>();
+
+
+                            for (int j = 0; j < lista_ids_tareas.length(); j++) {
+                                imagenesTarea.add(lista_ids_tareas.getString(j));
+                            }
+
+                            for (String imagen : imagenesTarea) {
+                                imagen = imagen.replace("[", "")
+                                        .replace("]", "")
+                                        .replace("\\", "") // elimina backslashes
+                                        .replace("\"", "")
+                                        .trim();
+
+                                // Crear un nuevo ImageView para cada usuario
+                                ImageView img = new ImageView(proyecto.this);
+
+                                // Establecer el tamaño y márgenes
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dpToPx(24), dpToPx(24));
+                                params.setMargins(0, 0, dpToPx(8), 0);
+                                img.setLayoutParams(params);
+
+                                // Estilo opcional: imagen circular
+                                int radiusDp = 24;
+                                int radiusPx = dpToPx(radiusDp);
+
+                                Glide.with(proyecto.this)
+                                        .load(imagen)
+                                        .transform(new CenterCrop(), new RoundedCornersTransformation(radiusPx, 0))
+                                        .placeholder(R.drawable.ic_launcher_foreground)
+                                        .error(R.drawable.user)
+                                        .into(img);
+
+                                // Agregar imagen al contenedor dentro de la tarjeta
+                                ((LinearLayout) cardView.findViewById(R.id.miembrosLayout)).addView(img); // asegúrate de tener este ID en tu layout
+                            }
+
+
+                        } else {
+                            //Toast.makeText(this, mensaje_tareas, Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (JSONException te) {
+                        te.printStackTrace();
+                        Toast.makeText(this, "Error de JSON", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> Toast.makeText(this, "Error de conexión", Toast.LENGTH_SHORT).show()
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params_tareas = new HashMap<>();
+                params_tareas.put("id_tarea", idTarea);
+                return params_tareas;
+            }
+        };
+        Volley.newRequestQueue(this).add(stringRequest_tareas);
+    }
+
+    private void mostrarInformacionTarea(String titulo, String descripcion, String fecha, String estado, TextView txtEstadoCard){
+    LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.dialog_info_tarea, null);
+
+        TextView txtTitulo = view.findViewById(R.id.txtTitulo);
+        TextView txtDescripcion = view.findViewById(R.id.txtDescripcion);
+        TextView txtFecha = view.findViewById(R.id.txtFecha);
+        TextView txtEstado = view.findViewById(R.id.txtEstado);
+        CheckBox checkCompletado = view.findViewById(R.id.checkTareaCompletada);
+
+        txtTitulo.setText("Título: " + titulo);
+        txtDescripcion.setText("Descripción: " + descripcion);
+        txtFecha.setText("Fecha: " + fecha);
+        txtEstado.setText("Estado: " + estado);
+
+        checkCompletado.setChecked(estado.equals("Finalizado"));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Detalles de la tarea");
+        builder.setView(view);
+        builder.setPositiveButton("Cerrar", null);
+        builder.setNegativeButton("Guardar", (dialog, which) -> {
+            boolean estaCompletada = checkCompletado.isChecked();
+            String nuevoEstado = estaCompletada ? "Finalizado" : "Pendiente";
+            txtEstadoCard.setText("Estado: " + nuevoEstado);
+
+            // Cambiar color del texto según estado
+            int color = estaCompletada ?
+                    ContextCompat.getColor(this, R.color.estado_finalizado) :
+                    ContextCompat.getColor(this, R.color.estado_pendiente);
+            txtEstadoCard.setTextColor(color);
+
+            // Opcional: actualizar en el servidor
+            Toast.makeText(this, "Estado actualizado a: " + nuevoEstado, Toast.LENGTH_SHORT).show();
+        });
+
+        builder.show();
+    }
+
 
 
 }
