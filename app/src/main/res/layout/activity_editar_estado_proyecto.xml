@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".registrar_estado_proyecto">
+    tools:context=".editar_estado_proyecto">
 
     <!-- 🔝 Barra superior personalizada -->
     <LinearLayout
@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Nuevo estado"
+            android:text="Editar estado"
             android:textColor="@color/color_titulo"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -87,15 +87,25 @@
 
 
             <Button
-                android:id="@+id/Crearestado"
+                android:id="@+id/EditarEstado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Crear Estado"
+                android:text="Editar Estado"
                 android:layout_marginTop="24dp"
                 android:backgroundTint="@color/color_principal"
                 android:textColor="@color/color_titulo" />
+
+            <Button
+                android:id="@+id/btnEliminarEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Eliminar Estado"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/color_rojo"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

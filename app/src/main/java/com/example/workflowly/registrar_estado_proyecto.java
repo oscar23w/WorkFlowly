@@ -46,11 +46,11 @@ public class registrar_estado_proyecto extends AppCompatActivity {
             public void onClick(View v) {
                 EditText editTextNombreEstado = findViewById(R.id.editTextNombreEstado);
                 EditText editTextDescripcionEstado = findViewById(R.id.editTextDescription);
-                EditText editTextPosicionEstado = findViewById(R.id.posicion);
+
 
                 String nombreEstado = editTextNombreEstado.getText().toString().trim();
                 String descripcionEstado = editTextDescripcionEstado.getText().toString().trim();
-                String posicionEstado = editTextPosicionEstado.getText().toString().trim();
+
 
                 String url = "http://workflowly.atwebpages.com/app_db_conexion/registro_estado_proyecto.php";
 
@@ -84,7 +84,6 @@ public class registrar_estado_proyecto extends AppCompatActivity {
                         params.put("id_proyecto", idProyecto);
                         params.put("nombre_estado", nombreEstado);
                         params.put("descripcion_estado", descripcionEstado);
-                        params.put("posicion_estado", posicionEstado);
                         return params;
                     }
                 };

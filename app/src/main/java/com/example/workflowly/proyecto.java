@@ -9,11 +9,15 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.CheckBox;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -55,6 +59,7 @@ public class proyecto extends AppCompatActivity {
     private HorizontalScrollView horizontalScrollView;
     private String idProyecto;
     private LinearLayout contenedorColumnas;
+    private boolean isMoving = false; // bandera de movimiento
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,18 +126,50 @@ public class proyecto extends AppCompatActivity {
                                 contenedorColumna.setLayoutParams(contenedorParams);
 
                                 // Título de columna (fijo)
+                                // Contenedor horizontal para el título y botones
+                                LinearLayout tituloYBotones = new LinearLayout(this);
+                                tituloYBotones.setOrientation(LinearLayout.HORIZONTAL);
+                                tituloYBotones.setBackgroundColor(Color.parseColor("#4CAF50")); // Fondo verde
+                                tituloYBotones.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+                                tituloYBotones.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                ));
+                                tituloYBotones.setGravity(Gravity.CENTER_VERTICAL);
+
+// Botón flecha izquierda
+                                ImageButton btnIzquierda = new ImageButton(this);
+                                btnIzquierda.setImageResource(android.R.drawable.ic_media_previous); // Puedes usar R.drawable.ic_arrow_left personalizado
+                                btnIzquierda.setBackgroundColor(Color.TRANSPARENT);
+                                btnIzquierda.setColorFilter(Color.WHITE);
+                                btnIzquierda.setOnClickListener(v -> moverColumnaConAnimacion(contenedorColumna, -1));
+                                tituloYBotones.addView(btnIzquierda);
+
+// Título (expandible al centro)
                                 TextView titulo = new TextView(this);
                                 titulo.setText(nombreColumna);
                                 titulo.setTextSize(18);
                                 titulo.setTypeface(null, Typeface.BOLD);
-                                titulo.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
-                                titulo.setBackgroundColor(Color.parseColor("#4CAF50"));
                                 titulo.setTextColor(Color.WHITE);
-                                titulo.setLayoutParams(new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT
-                                ));
-                                contenedorColumna.addView(titulo);
+                                LinearLayout.LayoutParams tituloParams = new LinearLayout.LayoutParams(
+                                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                                );
+                                titulo.setLayoutParams(tituloParams);
+                                titulo.setGravity(Gravity.CENTER);
+                                tituloYBotones.addView(titulo);
+
+// Botón flecha derecha
+                                ImageButton btnDerecha = new ImageButton(this);
+                                btnDerecha.setImageResource(android.R.drawable.ic_media_next); // Puedes usar R.drawable.ic_arrow_right personalizado
+                                btnDerecha.setBackgroundColor(Color.TRANSPARENT);
+                                btnDerecha.setColorFilter(Color.WHITE);
+                                btnDerecha.setOnClickListener(v -> moverColumnaConAnimacion(contenedorColumna, 1));
+                                tituloYBotones.addView(btnDerecha);
+
+// Añadir el título con botones al contenedor principal
+                                contenedorColumna.addView(tituloYBotones);
+
+
 
                                 // ScrollView para contenido de la columna
                                 ScrollView scrollView = new ScrollView(this);
@@ -171,7 +208,8 @@ public class proyecto extends AppCompatActivity {
                                 // Crear tareas/cards
                                 crear_tareas_por_columna(columna, idColumna);
 
-                                columna.setTag(idColumna); // Identificador
+                                //contenedorColumna.setTag(idColumna);// Identificador
+                                columna.setTag(idColumna); // ✅ Esta es la vista que recibe el drop
 
                                 //ARASTRAR CARDS AQUÍ
                                 arrastrar_cards(columna);
@@ -179,16 +217,32 @@ public class proyecto extends AppCompatActivity {
                                 scrollView.addView(columna); // Añadir contenido a scroll
                                 contenedorColumna.addView(scrollView); // Añadir scroll a columna principal
 
+                                //AGREGAR ENLACE PARA EDITAR EN EL TITULO DE LA Columna
+                                titulo.setOnClickListener(v -> {
+                                    Intent intent = new Intent(proyecto.this, editar_estado_proyecto.class);
+                                    intent.putExtra("idEstado", idColumna);
+                                    intent.putExtra("idProyecto", idProyecto);
+                                    startActivity(intent);
+                                });
+
                                 contenedorColumnas.addView(contenedorColumna); // Agregar columna completa al layout principal
+                                actualizarVisibilidadBotones();
 
                                 i++;
                             }
 
                             // Columna final: Añadir nuevo estado
                             crearColumnaParaAnadirNuevo();
+
+                            // Esperar al próximo frame para asegurarse que ya se añadieron todas las columnas
+                            contenedorColumnas.post(() -> actualizarVisibilidadBotones());
+
                         } else {
                             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
                             crearColumnaParaAnadirNuevo();
+                            // Esperar al próximo frame para asegurarse que ya se añadieron todas las columnas
+                            contenedorColumnas.post(() -> actualizarVisibilidadBotones());
+
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -639,6 +693,117 @@ public class proyecto extends AppCompatActivity {
         builder.show();
     }
 
+    private void moverColumnaConAnimacion(View columna, int direccion) {
+        if (isMoving) return;
+
+        int indexActual = contenedorColumnas.indexOfChild(columna);
+        int nuevoIndex = indexActual + direccion;
+
+        if (nuevoIndex >= 0 && nuevoIndex < contenedorColumnas.getChildCount()) {
+            isMoving = true;
+
+            TranslateAnimation anim = new TranslateAnimation(
+                    0, direccion * columna.getWidth(), 0, 0
+            );
+            anim.setDuration(300);
+            anim.setFillAfter(false);
+            columna.startAnimation(anim);
+
+            anim.setAnimationListener(new Animation.AnimationListener() {
+                @Override public void onAnimationStart(Animation animation) {}
+                @Override public void onAnimationRepeat(Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    columna.clearAnimation();
+                    contenedorColumnas.removeView(columna);
+                    contenedorColumnas.addView(columna, nuevoIndex);
+                    actualizarVisibilidadBotones(); // ✅ Aquí sí está bien
+                    contenedorColumnas.requestLayout();
+
+                    String idColumna = (String) columna.getTag();
+
+                    actualizarPosicionColumnaEnBD(idColumna, nuevoIndex, success -> {
+                        if (!success) {
+                            runOnUiThread(() -> {
+                                contenedorColumnas.removeView(columna);
+                                contenedorColumnas.addView(columna, indexActual);
+                                contenedorColumnas.requestLayout();
+                                actualizarVisibilidadBotones(); // ✅ También aquí
+                                Toast.makeText(columna.getContext(), "No se pudo guardar el orden. Se restauró.", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                        isMoving = false;
+                    });
+                }
+            });
+        }
+    }
+
+    private void actualizarPosicionColumnaEnBD(String idColumna, int nuevaPosicion, Consumer<Boolean> callback) {
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/actualizar_posicion_estado.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        callback.accept(estado.equals("ok"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.accept(false);
+                    }
+                },
+                error -> {
+                    error.printStackTrace();
+                    callback.accept(false);
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_estado", idColumna);
+                params.put("posicion", String.valueOf(nuevaPosicion));
+                params.put("id_proyecto", String.valueOf(idProyecto));
+                return params;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    private void actualizarVisibilidadBotones() {
+        int total = contenedorColumnas.getChildCount();
+
+        // Excluimos la última columna, asumiendo que es la de "añadir nuevo"
+        int totalColumnasLogicas = total - 1;
+
+        for (int i = 0; i < totalColumnasLogicas; i++) {
+            View columna = contenedorColumnas.getChildAt(i);
+
+            if (!(columna instanceof LinearLayout)) continue;
+
+            LinearLayout contenedorColumna = (LinearLayout) columna;
+
+            // Asegurarse de que el primer hijo sea el layout con botones y título
+            if (contenedorColumna.getChildCount() == 0) continue;
+
+            View tituloYBotonesView = contenedorColumna.getChildAt(0);
+            if (!(tituloYBotonesView instanceof LinearLayout)) continue;
+
+            LinearLayout tituloYBotones = (LinearLayout) tituloYBotonesView;
+
+            // Aseguramos que haya al menos 3 elementos (btn izq, título, btn der)
+            if (tituloYBotones.getChildCount() < 3) continue;
+
+            View btnIzquierda = tituloYBotones.getChildAt(0);
+            View btnDerecha = tituloYBotones.getChildAt(2);
+
+            // Mostrar u ocultar botones dependiendo de la posición
+            btnIzquierda.setVisibility(i == 0 ? View.GONE : View.VISIBLE);
+            btnDerecha.setVisibility(i == totalColumnasLogicas - 1 ? View.GONE : View.VISIBLE);
+        }
+    }
 
 
 }
