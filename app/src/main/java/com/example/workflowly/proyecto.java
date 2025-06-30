@@ -347,7 +347,7 @@ public class proyecto extends AppCompatActivity {
                                         String textoEstadoActual = finalTxtEstadoCard.getText().toString(); // Ej: "Estado: Finalizado"
                                         String estadoExtraido = textoEstadoActual.contains("Finalizado") ? "Finalizado" : "Pendiente";
 
-                                        mostrarInformacionTarea(finalTitulo, finalDescripcion, finalFecha, estadoExtraido, finalTxtEstadoCard);
+                                        mostrarInformacionTarea(finalTitulo, finalDescripcion, finalFecha, estadoExtraido, finalTxtEstadoCard, idTarea);
                                         return true;
                                     }
                                 }));
@@ -654,7 +654,7 @@ public class proyecto extends AppCompatActivity {
         Volley.newRequestQueue(this).add(stringRequest_tareas);
     }
 
-    private void mostrarInformacionTarea(String titulo, String descripcion, String fecha, String estado, TextView txtEstadoCard){
+    private void mostrarInformacionTarea(String titulo, String descripcion, String fecha, String estado, TextView txtEstadoCard, String idTarea){
     LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.dialog_info_tarea, null);
 
@@ -687,7 +687,7 @@ public class proyecto extends AppCompatActivity {
             txtEstadoCard.setTextColor(color);
 
             // Opcional: actualizar en el servidor
-            Toast.makeText(this, "Estado actualizado a: " + nuevoEstado, Toast.LENGTH_SHORT).show();
+            actualizarEstadoCompletadoTarea(idTarea, nuevoEstado);
         });
 
         builder.show();
@@ -803,6 +803,44 @@ public class proyecto extends AppCompatActivity {
             btnIzquierda.setVisibility(i == 0 ? View.GONE : View.VISIBLE);
             btnDerecha.setVisibility(i == totalColumnasLogicas - 1 ? View.GONE : View.VISIBLE);
         }
+    }
+
+    private void actualizarEstadoCompletadoTarea(String idTarea, String nuevoEstado){
+        String estado_actualizado;
+        if (nuevoEstado.equals("Finalizado")){
+            estado_actualizado = "0";
+        } else {
+            estado_actualizado = "1";
+        }
+
+        String url = "http://workflowly.atwebpages.com/app_db_conexion/editar_estado_completado_tarea.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        String estado = jsonResponse.getString("estado");
+                        if (estado.equals("ok")){
+                            Toast.makeText(this, "Estado actualizado a: " + nuevoEstado, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    error.printStackTrace();
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_tarea", idTarea);
+                params.put("estado", String.valueOf(estado_actualizado));
+                return params;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
 
