@@ -2,6 +2,7 @@ package com.example.workflowly;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,8 +43,17 @@ public class registrar_estado_proyecto extends AppCompatActivity {
 
         Button buttonCrearEstado = findViewById(R.id.Crearestado);
         buttonCrearEstado.setOnClickListener(new View.OnClickListener() {
+
+
+
+
             @Override
+
             public void onClick(View v) {
+
+                if (!validaciones()) {
+                    return; // Detener si la validación falla
+                }
                 EditText editTextNombreEstado = findViewById(R.id.editTextNombreEstado);
                 EditText editTextDescripcionEstado = findViewById(R.id.editTextDescription);
 
@@ -94,5 +104,21 @@ public class registrar_estado_proyecto extends AppCompatActivity {
             }
         });
 
+
+
+    }
+
+    public boolean validaciones() {
+        EditText editTextNombreEstado = findViewById(R.id.editTextNombreEstado);
+
+        String nombre = editTextNombreEstado.getText().toString().trim();
+
+        if (TextUtils.isEmpty(nombre)) {
+            editTextNombreEstado.setError("El nombre del estado es obligatorio");
+            editTextNombreEstado.requestFocus();
+            return false;
+        }
+
+        return true; // Todo está bien
     }
 }

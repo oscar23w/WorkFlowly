@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -144,7 +145,12 @@ public class nueva_tarea extends AppCompatActivity {
 
         BotonAgregarUsuario.setOnClickListener(v -> {
             String user = username.getText().toString().trim();
-            miembro_crear_tarea nuevo = new miembro_crear_tarea(user);
+
+            if (TextUtils.isEmpty(user)) {
+                username.setError("Debes escribir un nombre de usuario");
+                username.requestFocus();
+                return;
+            }
 
             boolean yaExiste = false;
             for (miembro_crear_tarea m : listaMiembrosAgregados) {
@@ -155,6 +161,7 @@ public class nueva_tarea extends AppCompatActivity {
             }
 
             if (!yaExiste) {
+                miembro_crear_tarea nuevo = new miembro_crear_tarea(user);
                 listaMiembrosAgregados.add(nuevo);
                 miembroAdapter.notifyItemInserted(listaMiembrosAgregados.size() - 1);
                 Toast.makeText(getApplicationContext(), "Usuario " + user + " añadido a la tarea", Toast.LENGTH_SHORT).show();
@@ -163,8 +170,9 @@ public class nueva_tarea extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Ya está en la lista", Toast.LENGTH_SHORT).show();
                 username.setText("");
             }
-
         });
+
+
     }
 
     public void agregar_calendario_input_fecha() {
@@ -209,6 +217,9 @@ public class nueva_tarea extends AppCompatActivity {
     }
 
     public void registrar_tarea(String idProyecto, String idEstado){
+        if (!validaciones()) {
+            return; // Cancelar si hay errores
+        }
         List<miembro_crear_tarea> miembros = miembroAdapter.getMiembros();
         List<String> nombres_de_usuario = new ArrayList<>();
         for (miembro_crear_tarea m : miembros) {
@@ -272,6 +283,33 @@ public class nueva_tarea extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    public boolean validaciones(){
+        EditText editTextNombreTarea = findViewById(R.id.editTextNombreTarea);
+        EditText editTextDescripcion = findViewById(R.id.editTextDescripcion);
+
+        String nombre = editTextNombreTarea.getText().toString().trim();
+        String descripcion = editTextDescripcion.getText().toString().trim();
+
+        if (TextUtils.isEmpty(nombre)) {
+            editTextNombreTarea.setError("El nombre del proyecto es obligatorio");
+            editTextNombreTarea.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(descripcion)) {
+            editTextDescripcion.setError("La descripción es obligatoria");
+            editTextDescripcion.requestFocus();
+            return false;
+        }
+
+        if (listaMiembrosAgregados == null || listaMiembrosAgregados.size() == 0) {
+            Toast.makeText(this, "Debes añadir al menos un miembro", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true; // Todo está bien
     }
 
 }

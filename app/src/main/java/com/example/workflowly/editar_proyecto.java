@@ -3,6 +3,7 @@ package com.example.workflowly;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -293,7 +294,38 @@ public class editar_proyecto extends AppCompatActivity {
         });
     }
 
+    private boolean validaciones() {
+        EditText editTextNombreProyecto = findViewById(R.id.editTextProjectName);
+        EditText editTextDescripcionProyecto = findViewById(R.id.editTextDescription);
+
+        String nombre = editTextNombreProyecto.getText().toString().trim();
+        String descripcion = editTextDescripcionProyecto.getText().toString().trim();
+
+        if (TextUtils.isEmpty(nombre)) {
+            editTextNombreProyecto.setError("El nombre del proyecto es obligatorio");
+            editTextNombreProyecto.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(descripcion)) {
+            editTextDescripcionProyecto.setError("La descripción es obligatoria");
+            editTextDescripcionProyecto.requestFocus();
+            return false;
+        }
+
+        if (listaMiembros == null || listaMiembros.size() == 0) {
+            Toast.makeText(this, "Debes añadir al menos un miembro", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true; // Todo está bien
+    }
+
+
     private void guardar_proyecto_function(String idProyecto){
+        if (!validaciones()) {
+            return; // Cancelar si hay errores
+        }
         List<miembro_crear_proyecto> miembros = miembroAdapter.getMiembros();
         List<String> usuarios = new ArrayList<>();
         for (miembro_crear_proyecto m : miembros) {

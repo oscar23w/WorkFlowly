@@ -136,8 +136,38 @@ public class Nuevo_Proyecto extends AppCompatActivity {
             requestQueue.add(stringRequest);
         });
     }
+    private boolean validaciones() {
+        EditText editTextNombreProyecto = findViewById(R.id.editTextProjectName);
+        EditText editTextDescripcionProyecto = findViewById(R.id.editTextDescription);
+
+        String nombre = editTextNombreProyecto.getText().toString().trim();
+        String descripcion = editTextDescripcionProyecto.getText().toString().trim();
+
+        if (TextUtils.isEmpty(nombre)) {
+            editTextNombreProyecto.setError("El nombre del proyecto es obligatorio");
+            editTextNombreProyecto.requestFocus();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(descripcion)) {
+            editTextDescripcionProyecto.setError("La descripción es obligatoria");
+            editTextDescripcionProyecto.requestFocus();
+            return false;
+        }
+
+        if (listaMiembros == null || listaMiembros.size() == 0) {
+            Toast.makeText(this, "Debes añadir al menos un miembro", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true; // Todo está bien
+    }
+
 
     private void guardar_proyecto_function(){
+        if (!validaciones()) {
+            return; // Cancelar si hay errores
+        }
         List<miembro_crear_proyecto> miembros = miembroAdapter.getMiembros();
         List<String> correos = new ArrayList<>();
         for (miembro_crear_proyecto m : miembros) {
@@ -208,4 +238,7 @@ public class Nuevo_Proyecto extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
+
+
 }

@@ -2,6 +2,7 @@ package com.example.workflowly;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -109,6 +110,10 @@ public class editar_estado_proyecto extends AppCompatActivity {
     }
 
     public void editar_estado(){
+
+        if (!validaciones()) {
+            return; // Detener si la validación falla
+        }
         EditText tituloEstado = findViewById(R.id.editTextNombreEstado);
         EditText descripcionEstado = findViewById(R.id.editTextDescription);
 
@@ -188,6 +193,20 @@ public class editar_estado_proyecto extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    public boolean validaciones() {
+        EditText editTextNombreEstado = findViewById(R.id.editTextNombreEstado);
+
+        String nombre = editTextNombreEstado.getText().toString().trim();
+
+        if (TextUtils.isEmpty(nombre)) {
+            editTextNombreEstado.setError("El nombre del estado es obligatorio");
+            editTextNombreEstado.requestFocus();
+            return false;
+        }
+
+        return true; // Todo está bien
     }
 
 }
