@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -124,6 +125,10 @@ public class nueva_tarea extends AppCompatActivity {
             miembroAdapter.notifyItemRemoved(position);
         });
         recyclerViewMembers.setAdapter(miembroAdapter);
+
+        ImageButton btnLimpiarFecha = findViewById(R.id.buttonSeleccionarFecha);
+        btnLimpiarFecha.setOnClickListener(v -> limpiarFecha());
+
 
         /*List<String> listaMiembros = Arrays.asList(
                 "Oscar Villarreal", "Luis Pérez", "María López", "Carlos García", "Ana Torres"
@@ -311,5 +316,16 @@ public class nueva_tarea extends AppCompatActivity {
 
         return true; // Todo está bien
     }
+
+    public void limpiarFecha() {
+        EditText editTextFecha = findViewById(R.id.editTextFechaVencimiento);
+        if (!TextUtils.isEmpty(editTextFecha.getText().toString())) {
+            editTextFecha.setText("");
+            Toast.makeText(this, "Fecha eliminada", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "No hay fecha para eliminar", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 }

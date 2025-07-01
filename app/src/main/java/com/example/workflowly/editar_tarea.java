@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,8 @@ public class editar_tarea extends AppCompatActivity {
 
         consultar_datos_tarea(idTarea, idProyecto);
         agregar_calendario_input_fecha();
+        ImageButton btnLimpiarFecha = findViewById(R.id.buttonSeleccionarFecha);
+        btnLimpiarFecha.setOnClickListener(v -> limpiarFecha());
 
         //BOTON EDITAR
         Button buttonEditarTarea = findViewById(R.id.btnGuardarTarea);
@@ -423,6 +426,15 @@ public class editar_tarea extends AppCompatActivity {
         }
 
         return true; // Todo está bien
+    }
+    public void limpiarFecha() {
+        EditText editTextFecha = findViewById(R.id.editTextFechaVencimiento);
+        if (!TextUtils.isEmpty(editTextFecha.getText().toString())) {
+            editTextFecha.setText("");
+            Toast.makeText(this, "Fecha eliminada", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "No hay fecha para eliminar", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

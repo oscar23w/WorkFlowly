@@ -71,14 +71,33 @@
                 android:text="Fecha de vencimiento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <EditText
-                android:id="@+id/editTextFechaVencimiento"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ej. 10/06/2025"
-                android:focusable="false"
-                android:clickable="true"
-                android:inputType="none" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editTextFechaVencimiento"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:hint="Ej. 10/06/2025"
+                    android:inputType="none" />
+
+                <ImageButton
+                    android:id="@+id/buttonSeleccionarFecha"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="Seleccionar fecha"
+                    android:src="@drawable/calendar"
+                    android:scaleType="centerInside"/>
+
+            </LinearLayout>
 
             <!-- Descripción -->
             <TextView
