@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.GestureDetector;
@@ -42,9 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import android.view.DragEvent;
@@ -208,7 +213,7 @@ public class proyecto extends AppCompatActivity {
                                 // Crear tareas/cards
                                 crear_tareas_por_columna(columna, idColumna);
 
-                                //contenedorColumna.setTag(idColumna);// Identificador
+                                contenedorColumna.setTag(idColumna);// Identificador
                                 columna.setTag(idColumna); // ✅ Esta es la vista que recibe el drop
 
                                 //ARASTRAR CARDS AQUÍ
@@ -323,13 +328,54 @@ public class proyecto extends AppCompatActivity {
                                     txtDescripcion.setVisibility(View.GONE);
                                 }
 
-                                if (estadosTareas.get(j).equals("0")){
-                                    txtEstado.setText("Estado: Pendiente");
-                                    txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_pendiente));
+                                if (estadosTareas.get(j).equals("0")) {
+                                    // Estado pendiente
+                                    String fechaTarea = fechasTareas.get(j);
+
+                                    if (!fechaTarea.equals("null") && !fechaTarea.isEmpty()) {
+                                        // Formato esperado: "yyyy-MM-dd"
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                        sdf.setLenient(false);
+                                        try {
+                                            Date fechaLimite = sdf.parse(fechaTarea);
+
+                                            // Obtener la fecha actual sin hora
+                                            Calendar calActual = Calendar.getInstance();
+                                            calActual.set(Calendar.HOUR_OF_DAY, 0);
+                                            calActual.set(Calendar.MINUTE, 0);
+                                            calActual.set(Calendar.SECOND, 0);
+                                            calActual.set(Calendar.MILLISECOND, 0);
+                                            Date fechaHoy = calActual.getTime();
+
+                                            if (fechaLimite != null && fechaLimite.before(fechaHoy)) {
+                                                // Fecha vencida
+                                                txtEstado.setText("Estado: Vencida");
+                                                txtEstado.setTextColor(Color.RED);
+                                            } else {
+                                                // Aún está dentro del plazo o es hoy
+                                                txtEstado.setText("Estado: Pendiente");
+                                                txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_pendiente));
+                                            }
+
+                                        } catch (ParseException e) {
+                                            // Si no se puede parsear, tratar como pendiente
+                                            txtEstado.setText("Estado: Pendiente");
+                                            txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_pendiente));
+                                        }
+
+                                    } else {
+                                        // No hay fecha, mostrar como pendiente
+                                        txtEstado.setText("Estado: Pendiente");
+                                        txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_pendiente));
+                                    }
+
                                 } else {
+                                    // Estado finalizado
                                     txtEstado.setText("Estado: Finalizado");
                                     txtEstado.setTextColor(ContextCompat.getColor(this, R.color.estado_finalizado));
                                 }
+
+
 
                                 // Agregar imagen de miembro (si quieres)
                                 String idTarea = idsTareas.get(j);
@@ -808,9 +854,9 @@ public class proyecto extends AppCompatActivity {
     private void actualizarEstadoCompletadoTarea(String idTarea, String nuevoEstado){
         String estado_actualizado;
         if (nuevoEstado.equals("Finalizado")){
-            estado_actualizado = "0";
-        } else {
             estado_actualizado = "1";
+        } else {
+            estado_actualizado = "0";
         }
 
         String url = "http://workflowly.atwebpages.com/app_db_conexion/editar_estado_completado_tarea.php";
