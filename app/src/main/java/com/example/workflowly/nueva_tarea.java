@@ -292,10 +292,8 @@ public class nueva_tarea extends AppCompatActivity {
 
     public boolean validaciones(){
         EditText editTextNombreTarea = findViewById(R.id.editTextNombreTarea);
-        EditText editTextDescripcion = findViewById(R.id.editTextDescripcion);
 
         String nombre = editTextNombreTarea.getText().toString().trim();
-        String descripcion = editTextDescripcion.getText().toString().trim();
 
         if (TextUtils.isEmpty(nombre)) {
             editTextNombreTarea.setError("El nombre del proyecto es obligatorio");
@@ -303,16 +301,7 @@ public class nueva_tarea extends AppCompatActivity {
             return false;
         }
 
-        if (TextUtils.isEmpty(descripcion)) {
-            editTextDescripcion.setError("La descripción es obligatoria");
-            editTextDescripcion.requestFocus();
-            return false;
-        }
 
-        if (listaMiembrosAgregados == null || listaMiembrosAgregados.size() == 0) {
-            Toast.makeText(this, "Debes añadir al menos un miembro", Toast.LENGTH_SHORT).show();
-            return false;
-        }
 
         return true; // Todo está bien
     }

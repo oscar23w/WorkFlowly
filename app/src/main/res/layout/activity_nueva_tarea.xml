@@ -89,13 +89,15 @@
 
                 <ImageButton
                     android:id="@+id/buttonSeleccionarFecha"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginStart="8dp"
                     android:background="@android:color/transparent"
+                    android:backgroundTint="#00FFFFFF"
                     android:contentDescription="Seleccionar fecha"
+                    android:scaleType="centerInside"
                     android:src="@drawable/calendar"
-                    android:scaleType="centerInside"/>
+                    android:alpha="0.6" />
 
             </LinearLayout>
 
