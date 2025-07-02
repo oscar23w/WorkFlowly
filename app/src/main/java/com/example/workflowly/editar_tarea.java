@@ -314,7 +314,8 @@ public class editar_tarea extends AppCompatActivity {
         EditText editTextDescripcionTarea = findViewById(R.id.editTextDescripcion);
 
         String NombreTarea = editTextNombreTarea.getText().toString().trim();
-        String FechaTarea = editTextFechaTarea.getText().toString().trim();
+        String FechaTareaTexto = editTextFechaTarea.getText().toString().trim();
+        String FechaTarea = FechaTareaTexto.isEmpty() ? "null" : FechaTareaTexto;
         String DescripcionTarea = editTextDescripcionTarea.getText().toString().trim();
 
         JSONArray jsonArrayMiembros = new JSONArray();

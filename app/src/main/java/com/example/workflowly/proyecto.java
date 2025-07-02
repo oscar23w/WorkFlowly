@@ -84,6 +84,9 @@ public class proyecto extends AppCompatActivity {
 
         //obtener id del proyecto
         idProyecto = getIntent().getStringExtra("idProyecto");
+
+        cerrar_pantalla_function();
+
         // Referencia al contenedor de columnas
         contenedorColumnas = findViewById(R.id.contenedorColumnas);
         creador_de_columnas();
@@ -207,7 +210,7 @@ public class proyecto extends AppCompatActivity {
 
                                 // Click en columna
                                 columna.setOnClickListener(v -> {
-                                    Toast.makeText(this, "ID de la columna: " + idColumna, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(this, "ID de la columna: " + idColumna, Toast.LENGTH_SHORT).show();
                                 });
 
                                 // Crear tareas/cards
@@ -243,7 +246,7 @@ public class proyecto extends AppCompatActivity {
                             contenedorColumnas.post(() -> actualizarVisibilidadBotones());
 
                         } else {
-                            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
                             crearColumnaParaAnadirNuevo();
                             // Esperar al próximo frame para asegurarse que ya se añadieron todas las columnas
                             contenedorColumnas.post(() -> actualizarVisibilidadBotones());
@@ -425,7 +428,7 @@ public class proyecto extends AppCompatActivity {
 
                             }
                         } else {
-                            Toast.makeText(this, mensaje_tareas, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(this, mensaje_tareas, Toast.LENGTH_SHORT).show();
                         }
 
                     } catch (JSONException te) {
@@ -776,7 +779,7 @@ public class proyecto extends AppCompatActivity {
                                 contenedorColumnas.addView(columna, indexActual);
                                 contenedorColumnas.requestLayout();
                                 actualizarVisibilidadBotones(); // ✅ También aquí
-                                Toast.makeText(columna.getContext(), "No se pudo guardar el orden. Se restauró.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(columna.getContext(), "No se pudo guardar el orden.", Toast.LENGTH_SHORT).show();
                             });
                         }
                         isMoving = false;
@@ -887,6 +890,15 @@ public class proyecto extends AppCompatActivity {
         };
 
         Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonClose);
+        botonCerrar.setOnClickListener(view -> {
+            Intent intent = new Intent(proyecto.this, MainActivity.class);
+            startActivity(intent);
+        });
     }
 
 

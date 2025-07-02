@@ -136,6 +136,7 @@ public class Nuevo_Proyecto extends AppCompatActivity {
             requestQueue.add(stringRequest);
         });
     }
+
     private boolean validaciones() {
         EditText editTextNombreProyecto = findViewById(R.id.editTextProjectName);
         EditText editTextDescripcionProyecto = findViewById(R.id.editTextDescription);
@@ -162,7 +163,6 @@ public class Nuevo_Proyecto extends AppCompatActivity {
 
         return true; // Todo está bien
     }
-
 
     private void guardar_proyecto_function(){
         if (!validaciones()) {
@@ -238,7 +238,5 @@ public class Nuevo_Proyecto extends AppCompatActivity {
             startActivity(intent);
         });
     }
-
-
 
 }

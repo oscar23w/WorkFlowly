@@ -157,7 +157,7 @@ public class HomeFragment extends Fragment {
 
                                 String idProyecto = idsProyectos.get(i);
                                 cardView.setOnClickListener(v -> {
-                                    Toast.makeText(requireContext(), "ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(requireContext(), "ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
 
                                     Intent intent = new Intent(requireContext(), proyecto.class);
                                     intent.putExtra("idProyecto", idProyecto); // Si quieres enviar el ID
@@ -165,7 +165,7 @@ public class HomeFragment extends Fragment {
                                 });
 
                                 botonEditarProyecto.setOnClickListener(v -> {
-                                    Toast.makeText(requireContext(), "Editar proyecto => ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(requireContext(), "Editar proyecto => ID del proyecto: " + idProyecto, Toast.LENGTH_SHORT).show();
 
                                     Intent intent = new Intent(requireContext(), editar_proyecto.class);
                                     intent.putExtra("idProyecto", idProyecto);
@@ -177,7 +177,7 @@ public class HomeFragment extends Fragment {
                             }
 
                         } else {
-                            Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
