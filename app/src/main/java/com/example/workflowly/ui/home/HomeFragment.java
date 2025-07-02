@@ -56,7 +56,7 @@ public class HomeFragment extends Fragment {
         SharedPreferences preferences = requireActivity().getSharedPreferences("usuario_sesion", getContext().MODE_PRIVATE);
         String id_user = preferences.getString("idUser", null);
 
-        mostrar_proyectos(id_user);
+       //mostrar_proyectos(id_user);
 
         return root;
     }
@@ -68,6 +68,8 @@ public class HomeFragment extends Fragment {
 
     private void mostrar_proyectos(String id_user){
         LinearLayout linearLayout = binding.linearLayoutContenedor;
+        linearLayout.removeAllViews(); // ✅ Limpia antes de volver a inflar
+
         String url = "http://workflowly.atwebpages.com/app_db_conexion/mostrar_proyectos_usuario.php";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -201,4 +203,16 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SharedPreferences preferences = requireActivity().getSharedPreferences("usuario_sesion", getContext().MODE_PRIVATE);
+        String id_user = preferences.getString("idUser", null);
+
+        mostrar_proyectos(id_user);
+    }
+
+
 }

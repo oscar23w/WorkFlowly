@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                             String textoBienvenida = "Hola " + Usuario;
                             nombreUsuario.setText(textoBienvenida);
 
-                            int radiusDp = 0;
+                            int radiusDp = 12;
                             int radiusPx = dpToPx(radiusDp);
 
                             String img = jsonResponse.getString("img");
