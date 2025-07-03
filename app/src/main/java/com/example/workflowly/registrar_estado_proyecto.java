@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -37,6 +38,8 @@ public class registrar_estado_proyecto extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        cerrar_pantalla_function();
 
         //obtener id del proyecto
         String idProyecto = getIntent().getStringExtra("idProyecto");
@@ -121,4 +124,13 @@ public class registrar_estado_proyecto extends AppCompatActivity {
 
         return true; // Todo está bien
     }
+
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonClose);
+        botonCerrar.setOnClickListener(view -> {
+            finish();
+        });
+    }
+
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,8 @@ public class Cuenta extends AppCompatActivity {
         cerrarSesion();
         consultar_datos_usuario();
         abrirImagen();
+
+        cerrar_pantalla_function();
 
         EditText editPassword = findViewById(R.id.editTextPassword);
         Button botonCambiar = findViewById(R.id.buttonChangePassword);
@@ -246,6 +249,14 @@ public class Cuenta extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonCloseAccount);
+        botonCerrar.setOnClickListener(view -> {
+            finish();
+        });
     }
 
 }

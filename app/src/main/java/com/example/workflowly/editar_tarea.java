@@ -56,6 +56,8 @@ public class editar_tarea extends AppCompatActivity {
             return insets;
         });
 
+        cerrar_pantalla_function();
+
         String idTarea = getIntent().getStringExtra("idTarea");
         String idProyecto = getIntent().getStringExtra("idProyecto");
 
@@ -423,6 +425,14 @@ public class editar_tarea extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No hay fecha para eliminar", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonClose);
+        botonCerrar.setOnClickListener(view -> {
+            finish();
+        });
     }
 
 }

@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +62,8 @@ public class editar_proyecto extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        cerrar_pantalla_function();
 
         botonGuardar = findViewById(R.id.Editarproyecto);
         botonEliminar = findViewById(R.id.btnEliminarProyecto);
@@ -193,7 +196,7 @@ public class editar_proyecto extends AppCompatActivity {
 
     }
 
-    public void agregar_miembros_del_proyecto(List<String>listaMiembrosAgregados, List<String>listaIdMiembros, boolean mostrarBoton){
+    public void agregar_miembros_del_proyecto(List<String>listaMiembrosAgregados, List<String>listaIdMiembros, boolean mostrarBotones){
         // Inicializar RecyclerView y lista
         recyclerViewMembers = findViewById(R.id.recyclerViewMembers);
         recyclerViewMembers.setLayoutManager(new LinearLayoutManager(this));
@@ -210,14 +213,18 @@ public class editar_proyecto extends AppCompatActivity {
             String miembro = listaMiembrosAgregados.get(i);
             String id = listaIdMiembros.get(i);
 
-            if (id_user.equals(id)) {
+            boolean mostrarBoton = true;
+
+            if (mostrarBotones == true){
+                if (id_user.equals(id)) {
+                    mostrarBoton = false;
+                }
+            } else {
                 mostrarBoton = false;
             }
 
             miembro_crear_proyecto nuevo = new miembro_crear_proyecto(id, miembro, mostrarBoton);
-            if (!mostrarBoton){
-                mostrarBoton = true;
-            }
+
             listaMiembros.add(nuevo);
             miembroAdapter.notifyItemInserted(listaMiembros.size() - 1);
         }
@@ -320,7 +327,6 @@ public class editar_proyecto extends AppCompatActivity {
 
         return true; // Todo está bien
     }
-
 
     private void guardar_proyecto_function(String idProyecto){
         if (!validaciones()) {
@@ -456,5 +462,13 @@ public class editar_proyecto extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(stringRequest);
+    }
+
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonClose);
+        botonCerrar.setOnClickListener(view -> {
+            finish();
+        });
     }
 }

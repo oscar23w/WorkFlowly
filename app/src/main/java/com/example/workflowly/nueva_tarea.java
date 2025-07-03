@@ -53,6 +53,7 @@ public class nueva_tarea extends AppCompatActivity {
             return insets;
         });
 
+        cerrar_pantalla_function();
         agregar_calendario_input_fecha();
 
         //obtener id del proyecto
@@ -316,5 +317,11 @@ public class nueva_tarea extends AppCompatActivity {
         }
     }
 
-
+    private void cerrar_pantalla_function(){
+        // Botón cerrar
+        ImageButton botonCerrar = findViewById(R.id.buttonClose);
+        botonCerrar.setOnClickListener(view -> {
+            finish();
+        });
+    }
 }
